@@ -16,6 +16,7 @@
 //! ```
 
 pub mod recoverable;
+mod schnorr;
 
 use crate::hash::{HashFunction, Sha256};
 use crate::secp256k1::recoverable::Secp256k1RecoverableSignature;
