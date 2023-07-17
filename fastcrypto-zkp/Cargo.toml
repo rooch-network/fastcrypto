@@ -1,0 +1,47 @@
+[package]
+name = "fastcrypto-zkp"
+version = "0.1.1"
+license = "Apache-2.0"
+authors = ["Mysten Labs <build@mystenlabs.com>"]
+edition = "2021"
+publish = ["crates-io"]
+description = "zk-proof library used at Mysten Labs"
+repository = "https://github.com/MystenLabs/fastcrypto"
+
+[[bench]]
+name = "proving"
+harness = false
+
+[dependencies]
+ark-bls12-381 = "0.4.0"
+ark-bn254 = "0.4.0"
+ark-crypto-primitives = { version = "0.4.0", features = ["r1cs", "prf"] }
+ark-ec = { version = "0.4.1", features = ["parallel"]}
+ark-ff = { version = "0.4.1", features = ["asm", "parallel"]}
+ark-groth16 = "0.4.0"
+ark-relations = "0.4.0"
+ark-serialize = "0.4.1"
+blst = "0.3.10"
+byte-slice-cast = "1.2.2"
+fastcrypto = { path = "../fastcrypto", version = "0.1.5" }
+derive_more = "0.99.16"
+num-bigint = { version = "0.4", default-features = false, features = ["rand"] }
+regex = "1.7.3"
+schemars ="0.8.10"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.93"
+once_cell = "1.16"
+poseidon-ark = { git = "https://github.com/arnaucube/poseidon-ark.git", rev = "bf96de3b946e8b343c6b65412bae92f8d32251ad" }
+
+[dev-dependencies]
+ark-bls12-377 = "0.4.0"
+ark-bn254 = "0.4.0"
+ark-crypto-primitives = { version = "0.4.0", features = ["r1cs", "prf"] }
+ark-circom = { git = "https://github.com/gakonst/ark-circom.git", rev = "b892c62", default-features = false, features = ["circom-2"] }
+ark-r1cs-std = "0.4.0"
+ark-std = { version = "0.4.0", features = ["parallel"]}
+blake2 = "0.10.6"
+criterion = "0.4.0"
+hex = "0.4.3"
+proptest = "1.1.0"
+num-bigint = { version = "0.4", default-features = false, features = ["rand"] }

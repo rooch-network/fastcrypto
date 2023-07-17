@@ -1,0 +1,20 @@
+[package]
+name = "fastcrypto-derive"
+version = "0.1.3"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Mysten Labs <build@mystenlabs.com>"]
+readme = "../README.md"
+description = "Collection of useful cryptographic macros"
+repository = "https://github.com/MystenLabs/fastcrypto"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.107", features = ["derive"] }
+proc-macro2 = "1.0.47"
+quote = "1.0.23"
+convert_case = "0.6.0"
