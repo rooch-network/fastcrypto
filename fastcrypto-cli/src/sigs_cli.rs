@@ -10,6 +10,8 @@ use fastcrypto::{
     secp256k1::{
         recoverable::Secp256k1RecoverableSignature, Secp256k1KeyPair, Secp256k1PrivateKey,
         Secp256k1PublicKey, Secp256k1Signature,
+        schnorr::{SchnorrPublicKey, SchnorrKeyPair, SchnorrPrivateKey,
+        SchnorrSignature} 
     },
     secp256r1::{
         recoverable::Secp256r1RecoverableSignature, Secp256r1KeyPair, Secp256r1PrivateKey,
@@ -55,6 +57,7 @@ enum SignatureScheme {
     Secp256r1Recoverable,
     BLS12381MinSig,
     BLS12381MinPk,
+    Schnorr,
 }
 
 impl FromStr for SignatureScheme {
@@ -69,6 +72,7 @@ impl FromStr for SignatureScheme {
             "secp256r1-rec" => Ok(SignatureScheme::Secp256r1Recoverable),
             "bls12381-minsig" => Ok(SignatureScheme::BLS12381MinSig),
             "bls12381-minpk" => Ok(SignatureScheme::BLS12381MinPk),
+            "schnorr" => Ok(SignatureScheme::Schnorr),
             _ => Err(Error::new(ErrorKind::Other, "Invalid signature scheme.")),
         }
     }
@@ -162,6 +166,13 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                         Hex::encode(kp.public().as_ref()),
                     )
                 }
+                Ok(SignatureScheme::Schnorr) => {
+                    let kp = SchnorrKeyPair::generate(rng);
+                    (
+                        Hex::encode(kp.copy().private().as_ref()),
+                        Hex::encode(kp.public().as_ref()),
+                    )
+                }
                 Err(_) => return Err(FastCryptoError::InvalidInput),
             };
             println!("Private key in hex: {:?}", sk);
@@ -228,6 +239,15 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                         Hex::encode(kp.sign(&msg).as_ref()),
                     )
                 }
+                Ok(SignatureScheme::Schnorr) => {
+                    let kp = SchnorrKeyPair::from(
+                        SchnorrPrivateKey::from_bytes(&sk)?,
+                    );
+                    (
+                        Hex::encode(kp.public()),
+                        Hex::encode(kp.sign(&msg).as_ref()),
+                    )
+                }
                 Err(_) => return Err(FastCryptoError::InvalidInput),
             };
             println!("Signature in hex: {:?}", sig);
@@ -280,6 +300,14 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                     pk.verify(
                         &msg,
                         &fastcrypto::bls12381::min_pk::BLS12381Signature::from_bytes(&sig)?,
+                    )
+                }
+                Ok(SignatureScheme::Schnorr) => {
+                    let pk = SchnorrPublicKey::from_bytes(&pk)
+                        .map_err(|_| FastCryptoError::InvalidInput)?;
+                    pk.verify(
+                        &msg,
+                        &SchnorrSignature::from_bytes(&sig)?,
                     )
                 }
                 Err(_) => return Err(FastCryptoError::InvalidInput),
