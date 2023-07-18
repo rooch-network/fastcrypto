@@ -17,8 +17,9 @@
 //! let signature: SchnorrSignature = kp.sign(&message);
 //! assert!(kp.public().verify(&message, &signature).is_ok());
 //! ```
-use crate::serde_helpers::{to_custom_error, BytesRepresentation};
-use crate::traits::{InsecureDefault, Signer, SigningKey};
+use crate::hash::{HashFunction, Sha256};
+use crate::serde_helpers::BytesRepresentation;
+use crate::traits::{Signer, SigningKey};
 use crate::{
     encoding::Base64,
     error::FastCryptoError,
@@ -28,108 +29,149 @@ use crate::{
 use crate::{
     encoding::Encoding, generate_bytes_representation, serialize_deserialize_with_to_from_bytes,
 };
-use base64ct::Encoding as _;
 use fastcrypto_derive::{SilentDebug, SilentDisplay};
-use once_cell::sync::OnceCell;
+use once_cell::sync::{Lazy, OnceCell};
 use rust_secp256k1::Message;
 use rust_secp256k1::{
-    constants::{KEY_PAIR_SIZE, SCHNORR_PUBLIC_KEY_SIZE, SCHNORR_SIGNATURE_SIZE, SECRET_KEY_SIZE},
-    schnorr::Signature,
-    KeyPair as Secp256k1KeyPair, Secp256k1, SecretKey, XOnlyPublicKey,
+    constants, schnorr::Signature, All, KeyPair as Secp256k1KeyPair, Secp256k1, SecretKey,
+    XOnlyPublicKey,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde_with::{Bytes as SerdeBytes, DeserializeAs, SerializeAs};
 use std::{
     fmt::{self, Debug},
     str::FromStr,
 };
+use zeroize::Zeroize;
+
+pub static SECP256K1: Lazy<Secp256k1<All>> = Lazy::new(rust_secp256k1::Secp256k1::new);
+
+/// The length of a public key in bytes.
+pub const SCHNORR_PUBLIC_KEY_LENGTH: usize = constants::SCHNORR_PUBLIC_KEY_SIZE;
+
+/// The length of a private key in bytes.
+pub const SCHNORR_PRIVATE_KEY_LENGTH: usize = constants::SECRET_KEY_SIZE;
+
+/// The length of a signature in bytes.
+pub const SCHNORR_SIGNATURE_LENGTH: usize = constants::SCHNORR_SIGNATURE_SIZE;
+
+/// The key pair bytes length is the same as the private key length. This enforces deserialization to always derive the public key from the private key.
+pub const SCHNORR_KEYPAIR_LENGTH: usize = constants::SECRET_KEY_SIZE;
+
+/// Default hash function used for signing and verifying messages unless another hash function is
+/// specified using the `with_hash` functions.
+pub type DefaultHash = Sha256;
 
 /// Schnorr public key.
-#[derive(Clone, PartialEq, Eq)]
+#[readonly::make]
+#[derive(Debug, Clone)]
 pub struct SchnorrPublicKey {
     pub pubkey: XOnlyPublicKey,
-    // TODO Replace serialize() to AsRef<[u8]> - Helps implementing AsRef<[u8]>.
-    pub bytes: OnceCell<[u8; SCHNORR_PUBLIC_KEY_SIZE]>,
+    pub bytes: OnceCell<[u8; SCHNORR_PUBLIC_KEY_LENGTH]>,
 }
 
 /// Schnorr private key.
+#[readonly::make]
 #[derive(SilentDebug, SilentDisplay)]
-pub struct SchnorrPrivateKey(pub SecretKey);
+pub struct SchnorrPrivateKey {
+    pub privkey: SecretKey,
+    pub bytes: OnceCell<zeroize::Zeroizing<[u8; SCHNORR_PRIVATE_KEY_LENGTH]>>,
+}
 
 /// Schnorr key pair.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SchnorrKeyPair {
-    public: SchnorrPublicKey,
-    private: SchnorrPrivateKey,
+    pub public: SchnorrPublicKey,
+    pub secret: SchnorrPrivateKey,
 }
 
 /// Schnorr signature.
+#[readonly::make]
 #[derive(Debug, Clone)]
 pub struct SchnorrSignature {
     pub sig: Signature,
-    // Helps implementing AsRef<[u8]>.
-    pub bytes: OnceCell<[u8; SCHNORR_SIGNATURE_SIZE]>,
+    pub bytes: OnceCell<[u8; SCHNORR_SIGNATURE_LENGTH]>,
 }
 
 //
 // Implementation of [SchnorrPrivateKey].
 //
 
+impl SigningKey for SchnorrPrivateKey {
+    type PubKey = SchnorrPublicKey;
+    type Sig = SchnorrSignature;
+    const LENGTH: usize = SCHNORR_PRIVATE_KEY_LENGTH;
+}
+
+impl ToFromBytes for SchnorrPrivateKey {
+    fn from_bytes(bytes: &[u8]) -> Result<Self, FastCryptoError> {
+        match SecretKey::from_slice(bytes) {
+            Ok(privkey) => Ok(SchnorrPrivateKey {
+                privkey,
+                bytes: OnceCell::new(),
+            }),
+            Err(_) => Err(FastCryptoError::InvalidInput),
+        }
+    }
+}
+
 impl PartialEq for SchnorrPrivateKey {
     fn eq(&self, other: &Self) -> bool {
-        self.as_ref() == other.as_ref()
+        self.privkey == other.privkey
     }
 }
 
 impl Eq for SchnorrPrivateKey {}
 
-// implement AsRef for SchnorrPrivateKey
+serialize_deserialize_with_to_from_bytes!(SchnorrPrivateKey, SCHNORR_PRIVATE_KEY_LENGTH);
+
 impl AsRef<[u8]> for SchnorrPrivateKey {
     fn as_ref(&self) -> &[u8] {
-        self.0.as_ref()
+        self.bytes
+            .get_or_init::<_>(|| zeroize::Zeroizing::new(self.privkey.secret_bytes()))
+            .as_ref()
     }
 }
 
-impl SigningKey for SchnorrPrivateKey {
-    type PubKey = SchnorrPublicKey;
-    type Sig = SchnorrSignature;
-    const LENGTH: usize = SECRET_KEY_SIZE;
-}
-
-impl ToFromBytes for SchnorrPrivateKey {
-    fn from_bytes(bytes: &[u8]) -> Result<Self, FastCryptoError> {
-        SecretKey::from_slice(bytes)
-            .map(SchnorrPrivateKey)
-            .map_err(|_| FastCryptoError::InvalidInput)
+impl zeroize::Zeroize for SchnorrPrivateKey {
+    fn zeroize(&mut self) {
+        // Unwrap is safe here because we are using a constant and it has been tested
+        // (see fastcrypto/src/tests/secp256k1_tests::test_sk_zeroization_on_drop)
+        self.privkey = SecretKey::from_slice(&constants::ONE).unwrap();
+        self.bytes.take().zeroize();
     }
 }
 
-serialize_deserialize_with_to_from_bytes!(SchnorrPrivateKey, SECRET_KEY_SIZE);
+impl zeroize::ZeroizeOnDrop for SchnorrPrivateKey {}
+
+impl Drop for SchnorrPrivateKey {
+    fn drop(&mut self) {
+        self.zeroize();
+    }
+}
 
 //
 // Implementation of [SchnorrKeyPair].
 //
 
 impl From<SchnorrPrivateKey> for SchnorrKeyPair {
-    fn from(private: SchnorrPrivateKey) -> Self {
-        let public = SchnorrPublicKey::from(&private);
-        SchnorrKeyPair { public, private }
+    fn from(secret: SchnorrPrivateKey) -> Self {
+        let public = SchnorrPublicKey::from(&secret);
+        SchnorrKeyPair { public, secret }
     }
 }
 
 impl ToFromBytes for SchnorrKeyPair {
     fn from_bytes(bytes: &[u8]) -> Result<Self, FastCryptoError> {
-        SchnorrPrivateKey::from_bytes(bytes).map(|private| private.into())
+        SchnorrPrivateKey::from_bytes(bytes).map(|secret| secret.into())
     }
 }
 
 impl AsRef<[u8]> for SchnorrKeyPair {
     fn as_ref(&self) -> &[u8] {
-        self.private.as_ref()
+        self.secret.as_ref()
     }
 }
 
-serialize_deserialize_with_to_from_bytes!(SchnorrKeyPair, KEY_PAIR_SIZE);
+serialize_deserialize_with_to_from_bytes!(SchnorrKeyPair, SCHNORR_KEYPAIR_LENGTH);
 
 impl KeyPair for SchnorrKeyPair {
     type PubKey = SchnorrPublicKey;
@@ -141,25 +183,28 @@ impl KeyPair for SchnorrKeyPair {
     }
 
     fn private(self) -> Self::PrivKey {
-        SchnorrPrivateKey::from_bytes(self.private.as_ref()).unwrap()
+        SchnorrPrivateKey::from_bytes(self.secret.as_ref()).unwrap()
     }
 
     #[cfg(feature = "copy_key")]
     fn copy(&self) -> Self {
-        Self {
-            public: SchnorrPublicKey::from_bytes(self.public.as_ref()).unwrap(),
-            private: SchnorrPrivateKey::from_bytes(self.private.as_ref()).unwrap(),
+        SchnorrKeyPair {
+            public: self.public.clone(),
+            secret: SchnorrPrivateKey::from_bytes(self.secret.as_ref()).unwrap(),
         }
     }
 
     fn generate<R: AllowedRng>(rng: &mut R) -> Self {
-        let kp = SecretKey::new(rng);
+        let (privkey, pubkey) = SECP256K1.generate_keypair(rng);
         SchnorrKeyPair {
             public: SchnorrPublicKey {
-                pubkey: kp.x_only_public_key(&Secp256k1::new()).0,
+                pubkey: pubkey.x_only_public_key().0,
                 bytes: OnceCell::new(),
             },
-            private: SchnorrPrivateKey(kp),
+            secret: SchnorrPrivateKey {
+                privkey,
+                bytes: OnceCell::new(),
+            },
         }
     }
 }
@@ -173,25 +218,22 @@ impl FromStr for SchnorrKeyPair {
     }
 }
 
-impl From<SecretKey> for SchnorrKeyPair {
-    fn from(kp: SecretKey) -> Self {
-        SchnorrKeyPair {
-            public: SchnorrPublicKey {
-                pubkey: kp.x_only_public_key(&Secp256k1::new()).0,
-                bytes: OnceCell::new(),
-            },
-            private: SchnorrPrivateKey(kp),
+impl SchnorrKeyPair {
+    /// Create a new signature using the given hash function to hash the message.
+    pub fn sign_with_hash<H: HashFunction<32>>(&self, msg: &[u8]) -> SchnorrSignature {
+        let message = Message::from_slice(H::digest(msg).as_ref()).unwrap();
+        let keypair = Secp256k1KeyPair::from_secret_key(&SECP256K1, &self.secret.privkey);
+
+        SchnorrSignature {
+            sig: Secp256k1::signing_only().sign_schnorr(&message, &keypair),
+            bytes: OnceCell::new(),
         }
     }
 }
 
 impl Signer<SchnorrSignature> for SchnorrKeyPair {
     fn sign(&self, msg: &[u8]) -> SchnorrSignature {
-        let keypair = Secp256k1KeyPair::from_secret_key(&Secp256k1::new(), &self.private.0);
-        SchnorrSignature {
-            sig: keypair.sign_schnorr(Message::from_slice(msg).unwrap()),
-            bytes: OnceCell::new(),
-        }
+        self.sign_with_hash::<DefaultHash>(msg)
     }
 }
 
@@ -199,16 +241,18 @@ impl Signer<SchnorrSignature> for SchnorrKeyPair {
 // Implementation Authenticator of [SchnorrSignature].
 //
 
-serialize_deserialize_with_to_from_bytes!(SchnorrSignature, SCHNORR_SIGNATURE_SIZE);
+serialize_deserialize_with_to_from_bytes!(SchnorrSignature, SCHNORR_SIGNATURE_LENGTH);
 generate_bytes_representation!(
     SchnorrSignature,
-    SCHNORR_SIGNATURE_SIZE,
+    SCHNORR_SIGNATURE_LENGTH,
     SchnorrSignatureAsBytes
 );
 
+impl_base64_display_fmt!(SchnorrSignature);
+
 impl PartialEq for SchnorrSignature {
     fn eq(&self, other: &Self) -> bool {
-        self.as_ref() == other.as_ref()
+        self.sig == other.sig
     }
 }
 
@@ -217,11 +261,14 @@ impl Eq for SchnorrSignature {}
 impl Authenticator for SchnorrSignature {
     type PubKey = SchnorrPublicKey;
     type PrivKey = SchnorrPrivateKey;
-    const LENGTH: usize = SCHNORR_SIGNATURE_SIZE;
+    const LENGTH: usize = SCHNORR_SIGNATURE_LENGTH;
 }
 
 impl ToFromBytes for SchnorrSignature {
     fn from_bytes(bytes: &[u8]) -> Result<Self, FastCryptoError> {
+        if bytes.len() != SCHNORR_SIGNATURE_LENGTH {
+            return Err(FastCryptoError::InputLengthWrong(SCHNORR_SIGNATURE_LENGTH));
+        }
         Signature::from_slice(bytes)
             .map(|sig| SchnorrSignature {
                 sig,
@@ -237,11 +284,18 @@ impl AsRef<[u8]> for SchnorrSignature {
     }
 }
 
-impl_base64_display_fmt!(SchnorrSignature);
+impl std::hash::Hash for SchnorrSignature {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.as_ref().hash(state);
+    }
+}
 
-impl Default for SchnorrSignature {
-    fn default() -> Self {
-        SchnorrSignature::from_bytes(&[1u8; SCHNORR_SIGNATURE_SIZE]).unwrap()
+impl From<&Signature> for SchnorrSignature {
+    fn from(schnorr_signature: &Signature) -> Self {
+        SchnorrSignature {
+            sig: *schnorr_signature,
+            bytes: OnceCell::new(),
+        }
     }
 }
 
@@ -250,9 +304,9 @@ impl Default for SchnorrSignature {
 //
 
 impl<'a> From<&'a SchnorrPrivateKey> for SchnorrPublicKey {
-    fn from(private: &'a SchnorrPrivateKey) -> Self {
+    fn from(secret: &'a SchnorrPrivateKey) -> Self {
         SchnorrPublicKey {
-            pubkey: private.0.x_only_public_key(&Secp256k1::new()).0,
+            pubkey: secret.privkey.x_only_public_key(&SECP256K1).0,
             bytes: OnceCell::new(),
         }
     }
@@ -260,45 +314,41 @@ impl<'a> From<&'a SchnorrPrivateKey> for SchnorrPublicKey {
 
 impl ToFromBytes for SchnorrPublicKey {
     fn from_bytes(bytes: &[u8]) -> Result<Self, FastCryptoError> {
-        XOnlyPublicKey::from_slice(bytes)
-            .map(|public| SchnorrPublicKey {
-                pubkey: public,
+        match XOnlyPublicKey::from_slice(bytes) {
+            Ok(pubkey) => Ok(SchnorrPublicKey {
+                pubkey,
                 bytes: OnceCell::new(),
-            })
-            .map_err(|_| FastCryptoError::InvalidInput)
+            }),
+            Err(_) => Err(FastCryptoError::InvalidInput),
+        }
     }
 }
 
-impl InsecureDefault for SchnorrPublicKey {
-    fn insecure_default() -> Self {
-        SchnorrPublicKey::from_bytes(&[0u8; 32]).unwrap()
-    }
-}
-
-impl Debug for SchnorrPublicKey {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", Base64::encode(self.as_bytes().as_ref()))
-    }
-}
-
-#[allow(clippy::derive_hash_xor_eq)]
 impl std::hash::Hash for SchnorrPublicKey {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.as_bytes().hash(state)
+        self.as_ref().hash(state);
     }
 }
 
 impl PartialOrd for SchnorrPublicKey {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.as_bytes().partial_cmp(other.as_bytes())
+        self.pubkey.partial_cmp(&other.pubkey)
     }
 }
 
 impl Ord for SchnorrPublicKey {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.as_bytes().cmp(other.as_bytes())
+        self.pubkey.cmp(&other.pubkey)
     }
 }
+
+impl PartialEq for SchnorrPublicKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.pubkey == other.pubkey
+    }
+}
+
+impl Eq for SchnorrPublicKey {}
 
 impl AsRef<[u8]> for SchnorrPublicKey {
     fn as_ref(&self) -> &[u8] {
@@ -308,87 +358,35 @@ impl AsRef<[u8]> for SchnorrPublicKey {
 
 impl_base64_display_fmt!(SchnorrPublicKey);
 
-impl Default for SchnorrPublicKey {
-    fn default() -> Self {
-        SchnorrPublicKey::from_bytes(&[1u8; SCHNORR_PUBLIC_KEY_SIZE]).unwrap()
-    }
-}
-
-serialize_deserialize_with_to_from_bytes!(SchnorrPublicKey, SCHNORR_PUBLIC_KEY_SIZE);
+serialize_deserialize_with_to_from_bytes!(SchnorrPublicKey, SCHNORR_PUBLIC_KEY_LENGTH);
 generate_bytes_representation!(
     SchnorrPublicKey,
-    SCHNORR_PUBLIC_KEY_SIZE,
+    SCHNORR_PUBLIC_KEY_LENGTH,
     SchnorrPublicKeyAsBytes
 );
 impl VerifyingKey for SchnorrPublicKey {
     type PrivKey = SchnorrPrivateKey;
     type Sig = SchnorrSignature;
-    const LENGTH: usize = SCHNORR_PUBLIC_KEY_SIZE;
+    const LENGTH: usize = SCHNORR_PUBLIC_KEY_LENGTH;
 
     fn verify(&self, msg: &[u8], signature: &SchnorrSignature) -> Result<(), FastCryptoError> {
-        Secp256k1::verify_schnorr(
-            &Secp256k1::new(),
-            &signature.sig,
-            &Message::from_slice(msg).unwrap(),
-            &self.pubkey,
-        )
-        .map_err(|_| FastCryptoError::InvalidSignature)
-    }
-
-    #[cfg(any(test, feature = "experimental"))]
-    fn verify_batch_empty_fail(
-        _msg: &[u8],
-        _pks: &[Self],
-        _sigs: &[Self::Sig],
-    ) -> Result<(), eyre::Report> {
-        todo!()
-    }
-
-    #[cfg(any(test, feature = "experimental"))]
-    fn verify_batch_empty_fail_different_msg<'a, M>(
-        _msgs: &[M],
-        _pks: &[Self],
-        _sigs: &[Self::Sig],
-    ) -> Result<(), eyre::Report>
-    where
-        M: std::borrow::Borrow<[u8]> + 'a,
-    {
-        todo!()
+        self.verify_with_hash::<DefaultHash>(msg, signature)
+            .map_err(|_| FastCryptoError::InvalidSignature)
     }
 }
 
-//
-// Serde for a signature
-//
-
-pub struct SingleSignature;
-
-impl SerializeAs<Signature> for SingleSignature {
-    fn serialize_as<S>(source: &Signature, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        if serializer.is_human_readable() {
-            // Serialise to Base64 encoded String
-            Base64::encode(source.as_ref()).serialize(serializer)
-        } else {
-            // Serialise to Bytes
-            SerdeBytes::serialize_as(&source.as_ref(), serializer)
-        }
-    }
-}
-
-impl<'de> DeserializeAs<'de, Signature> for SingleSignature {
-    fn deserialize_as<D>(deserializer: D) -> Result<Signature, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let bytes = if deserializer.is_human_readable() {
-            let s = String::deserialize(deserializer)?;
-            base64ct::Base64::decode_vec(&s).map_err(to_custom_error::<'de, D, _>)?
-        } else {
-            SerdeBytes::deserialize_as(deserializer)?
-        };
-        Signature::from_slice(bytes.as_slice()).map_err(to_custom_error::<'de, D, _>)
+impl SchnorrPublicKey {
+    /// Verify the signature using the given hash function to hash the message.
+    pub fn verify_with_hash<H: HashFunction<32>>(
+        &self,
+        msg: &[u8],
+        signature: &SchnorrSignature,
+    ) -> Result<(), FastCryptoError> {
+        // This fails if the output of the hash function is not 32 bytes, but that is ensured by the def of H.
+        let hashed_message = Message::from_slice(H::digest(msg).as_ref()).unwrap();
+        signature
+            .sig
+            .verify(&hashed_message, &self.pubkey)
+            .map_err(|_| FastCryptoError::InvalidSignature)
     }
 }
