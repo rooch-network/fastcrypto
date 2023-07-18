@@ -9,14 +9,13 @@
 //! ```rust
 //! # use fastcrypto::secp256k1::schnorr::*;
 //! # use fastcrypto::traits::{KeyPair, Signer, VerifyingKey};
-//! # use fastcrypto::secp256k1::Secp256k1KeyPair;
-//! # use rust_secp256k1::Message;
-//! use rand::thread_rng;
-//! let kp = Secp256k1KeyPair::generate(&mut thread_rng());
-//! let message: Message = Message::from_slice(b"Hello, world!").unwrap();
-//! let signature = kp.sign_schnorr(&message);
-//! let pubkey = kp.x_only_public_key(&Secp256k1::new()).0;
-//! assert!(signature.verify(self, &message, &pubkey).is_ok());
+//! use rust_secp256k1::{Message, Secp256k1};
+//! use rand::*;
+//! let mut rng = thread_rng();
+//! let kp = SchnorrKeyPair::generate(&mut rng);
+//! let message: [u8; 32] = random();
+//! let signature: SchnorrSignature = kp.sign(&message);
+//! assert!(kp.public().verify(&message, &signature).is_ok());
 //! ```
 use crate::serde_helpers::{to_custom_error, BytesRepresentation};
 use crate::traits::{InsecureDefault, Signer, SigningKey};
@@ -40,7 +39,6 @@ use rust_secp256k1::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_with::{Bytes as SerdeBytes, DeserializeAs, SerializeAs};
-use std::borrow::Borrow;
 use std::{
     fmt::{self, Debug},
     str::FromStr,
@@ -353,7 +351,7 @@ impl VerifyingKey for SchnorrPublicKey {
         _sigs: &[Self::Sig],
     ) -> Result<(), eyre::Report>
     where
-        M: Borrow<[u8]> + 'a,
+        M: std::borrow::Borrow<[u8]> + 'a,
     {
         todo!()
     }
