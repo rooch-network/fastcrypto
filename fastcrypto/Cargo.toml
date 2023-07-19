@@ -59,6 +59,7 @@ ark-ec = "0.4.1"
 ark-ff = "0.4.1"
 ark-serialize = "0.4.1"
 lazy_static = "1.4.0"
+ripemd = "0.1.3"
 
 fastcrypto-derive = { path = "../fastcrypto-derive", version = "0.1.3" }
 

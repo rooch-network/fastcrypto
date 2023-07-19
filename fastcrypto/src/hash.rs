@@ -177,6 +177,9 @@ pub type Keccak256 = HashFunctionWrapper<sha3::Keccak256, 32>;
 /// The [BLAKE2-256](https://en.wikipedia.org/wiki/BLAKE_(hash_function)#BLAKE2) hash function with 256 bit digests.
 pub type Blake2b256 = HashFunctionWrapper<blake2::Blake2b<typenum::U32>, 32>;
 
+/// The [RIPEMD-160](https://en.wikipedia.org/wiki/RIPEMD#RIPEMD-160_hashes) hash function with 160 bit digests.
+pub type Ripemd160 = HashFunctionWrapper<ripemd::Ripemd160, 20>;
+
 /// The [BLAKE3](https://en.wikipedia.org/wiki/BLAKE_(hash_function)#BLAKE3) hash function with 256 bit digests.
 #[derive(Default)]
 pub struct Blake3 {
