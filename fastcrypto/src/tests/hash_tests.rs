@@ -3,8 +3,8 @@
 
 use crate::encoding::{Base64, Encoding};
 use crate::hash::{
-    Blake2b256, Digest, EllipticCurveMultisetHash, HashFunction, Keccak256, MultisetHash, Sha256,
-    Sha3_256, Sha3_512, Sha512,
+    Blake2b256, Blake3, Digest, EllipticCurveMultisetHash, HashFunction, Keccak256, MultisetHash,
+    Sha256, Sha3_256, Sha3_512, Sha512, Ripemd160,
 };
 use std::io::Write;
 
@@ -136,6 +136,29 @@ fn test_blake2b_256() {
         hex::decode("cc4e83cd4f030b0aabe27cf65a3ff92d0b5445f6466282e6b83a529b66094ebb").unwrap()
     );
 }
+
+#[test]
+fn test_blake3() {
+    let data =
+        hex::decode("301d56460954541aab6dd7ddc0dd08f8cb3ebd884784a0e797905107533cae62").unwrap();
+    let digest = Blake3::digest(data);
+    assert_eq!(
+        digest.as_ref(),
+        hex::decode("1b6d57a5017077b00cc9ce0641fb8ddcc136fbdb83325b31597fbe9441d9b269").unwrap()
+    );
+}
+
+#[test]
+fn test_ripemd_160() {
+    let data =
+        hex::decode("54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67").unwrap();
+    let digest = Ripemd160::digest(data);
+    assert_eq!(
+        digest.as_ref(),
+        hex::decode("37f332f68db77bd9d7edd4969571ad671cf9dd3b").unwrap()
+    );
+}
+
 
 #[test]
 fn test_accumulator() {

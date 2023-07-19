@@ -41,6 +41,7 @@ mod hash_benches {
             hash_single::<Keccak256, 32, _>("Keccak256", &input, &mut group);
             hash_single::<Sha512, 64, _>("Sha512", &input, &mut group);
             hash_single::<Sha3_512, 64, _>("Sha3_512", &input, &mut group);
+            hash_single::<Ripemd160, 20, _>("ripemd_160", &input, &mut group);
         }
     }
 
