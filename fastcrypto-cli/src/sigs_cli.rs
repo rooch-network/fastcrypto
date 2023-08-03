@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use clap::Parser;
+use fastcrypto::secp256k1::recoverable::{
+    Secp256k1RecoverableKeyPair, Secp256k1RecoverablePrivateKey, Secp256k1RecoverablePublicKey,
+};
 use fastcrypto::traits::Signer;
 use fastcrypto::{
     ed25519::{Ed25519KeyPair, Ed25519PrivateKey, Ed25519PublicKey, Ed25519Signature},
     encoding::{Encoding, Hex},
     error::FastCryptoError,
     secp256k1::{
-        recoverable::Secp256k1RecoverableSignature, Secp256k1KeyPair, Secp256k1PrivateKey,
-        Secp256k1PublicKey, Secp256k1Signature,
-        schnorr::{SchnorrPublicKey, SchnorrKeyPair, SchnorrPrivateKey,
-        SchnorrSignature} 
+        recoverable::Secp256k1RecoverableSignature,
+        schnorr::{SchnorrKeyPair, SchnorrPrivateKey, SchnorrPublicKey, SchnorrSignature},
+        Secp256k1KeyPair, Secp256k1PrivateKey, Secp256k1PublicKey, Secp256k1Signature,
     },
     secp256r1::{
         recoverable::Secp256r1RecoverableSignature, Secp256r1KeyPair, Secp256r1PrivateKey,
@@ -201,10 +203,12 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                     )
                 }
                 Ok(SignatureScheme::Secp256k1Recoverable) => {
-                    let kp = Secp256k1KeyPair::from(Secp256k1PrivateKey::from_bytes(&sk)?);
+                    let kp = Secp256k1RecoverableKeyPair::from(
+                        Secp256k1RecoverablePrivateKey::from_bytes(&sk)?,
+                    );
                     (
                         Hex::encode(kp.public()),
-                        Hex::encode(kp.sign_recoverable(&msg).as_ref()),
+                        Hex::encode(kp.sign(&msg).as_ref()),
                     )
                 }
                 Ok(SignatureScheme::Secp256r1) => {
@@ -240,9 +244,7 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                     )
                 }
                 Ok(SignatureScheme::Schnorr) => {
-                    let kp = SchnorrKeyPair::from(
-                        SchnorrPrivateKey::from_bytes(&sk)?,
-                    );
+                    let kp = SchnorrKeyPair::from(SchnorrPrivateKey::from_bytes(&sk)?);
                     (
                         Hex::encode(kp.public()),
                         Hex::encode(kp.sign(&msg).as_ref()),
@@ -272,9 +274,9 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                     pk.verify(&msg, &Secp256k1Signature::from_bytes(&sig)?)
                 }
                 Ok(SignatureScheme::Secp256k1Recoverable) => {
-                    let pk = Secp256k1PublicKey::from_bytes(&pk)
+                    let pk = Secp256k1RecoverablePublicKey::from_bytes(&pk)
                         .map_err(|_| FastCryptoError::InvalidInput)?;
-                    pk.verify_recoverable(&msg, &Secp256k1RecoverableSignature::from_bytes(&sig)?)
+                    pk.verify(&msg, &Secp256k1RecoverableSignature::from_bytes(&sig)?)
                 }
                 Ok(SignatureScheme::Secp256r1) => {
                     let pk = Secp256r1PublicKey::from_bytes(&pk)
@@ -305,10 +307,7 @@ fn execute(cmd: Command) -> Result<(), FastCryptoError> {
                 Ok(SignatureScheme::Schnorr) => {
                     let pk = SchnorrPublicKey::from_bytes(&pk)
                         .map_err(|_| FastCryptoError::InvalidInput)?;
-                    pk.verify(
-                        &msg,
-                        &SchnorrSignature::from_bytes(&sig)?,
-                    )
+                    pk.verify(&msg, &SchnorrSignature::from_bytes(&sig)?)
                 }
                 Err(_) => return Err(FastCryptoError::InvalidInput),
             };

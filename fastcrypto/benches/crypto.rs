@@ -8,6 +8,7 @@ extern crate rand;
 mod signature_benches {
     use super::*;
     use criterion::*;
+    use fastcrypto::secp256k1::recoverable::Secp256k1RecoverableKeyPair;
     use fastcrypto::secp256k1::Secp256k1KeyPair;
     use fastcrypto::secp256r1::Secp256r1KeyPair;
     use fastcrypto::traits::Signer;
@@ -50,7 +51,10 @@ mod signature_benches {
         sign_single::<bls12381::min_pk::BLS12381KeyPair, _>("BLS12381MinPk", &mut group);
         sign_single::<Secp256k1KeyPair, _>("Secp256k1", &mut group);
         sign_single::<Secp256r1KeyPair, _>("Secp256r1", &mut group);
-        sign_recoverable_single::<Secp256k1KeyPair, _>("Secp256k1 recoverable", &mut group);
+        sign_recoverable_single::<Secp256k1RecoverableKeyPair, _>(
+            "Secp256k1 recoverable",
+            &mut group,
+        );
         sign_recoverable_single::<Secp256r1KeyPair, _>("Secp256r1 recoverable", &mut group);
     }
 
@@ -88,7 +92,7 @@ mod signature_benches {
         verify_single::<bls12381::min_pk::BLS12381KeyPair, _>("BLS12381MinPk", &mut group);
         verify_single::<Secp256k1KeyPair, _>("Secp256k1", &mut group);
         verify_single::<Secp256r1KeyPair, _>("Secp256r1", &mut group);
-        recover_single::<Secp256k1KeyPair, _>("Secp256k1 recoverable", &mut group);
+        recover_single::<Secp256k1RecoverableKeyPair, _>("Secp256k1 recoverable", &mut group);
         recover_single::<Secp256r1KeyPair, _>("Secp256r1 recoverable", &mut group);
     }
 
