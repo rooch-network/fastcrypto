@@ -4,7 +4,7 @@
 use crate::encoding::{Base64, Encoding};
 use crate::hash::{
     Blake2b256, Blake3, Digest, EllipticCurveMultisetHash, HashFunction, Keccak256, MultisetHash,
-    Sha256, Sha3_256, Sha3_512, Sha512, Ripemd160,
+    Ripemd160, Sha256, Sha3_256, Sha3_512, Sha512,
 };
 use std::io::Write;
 
@@ -150,15 +150,16 @@ fn test_blake3() {
 
 #[test]
 fn test_ripemd_160() {
-    let data =
-        hex::decode("54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67").unwrap();
+    let data = hex::decode(
+        "54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67",
+    )
+    .unwrap();
     let digest = Ripemd160::digest(data);
     assert_eq!(
         digest.as_ref(),
         hex::decode("37f332f68db77bd9d7edd4969571ad671cf9dd3b").unwrap()
     );
 }
-
 
 #[test]
 fn test_accumulator() {
