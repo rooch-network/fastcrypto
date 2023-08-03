@@ -24,8 +24,10 @@ use crate::{
     encoding::{Base64, Encoding},
     error::FastCryptoError,
     impl_base64_display_fmt, serialize_deserialize_with_to_from_bytes,
+    generate_bytes_representation,
     traits::{EncodeDecodeBase64, ToFromBytes},
 };
+use crate::serde_helpers::BytesRepresentation;
 use once_cell::sync::{Lazy, OnceCell};
 pub use rust_secp256k1::ecdsa::Signature as Secp256k1Sig;
 use rust_secp256k1::{
@@ -51,6 +53,11 @@ pub struct Secp256k1RecoverableSignature {
 serialize_deserialize_with_to_from_bytes!(
     Secp256k1RecoverableSignature,
     SECP256K1_RECOVERABLE_SIGNATURE_SIZE
+);
+generate_bytes_representation!(
+    Secp256k1RecoverableSignature,
+    SECP256K1_RECOVERABLE_SIGNATURE_SIZE,
+    Secp256k1RecoverableSignatureAsBytes
 );
 
 impl ToFromBytes for Secp256k1RecoverableSignature {
