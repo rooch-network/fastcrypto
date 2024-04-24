@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["bls12381","multiplier","ristretto255","secp256r1"],"trait":["Doubling","FiatShamirChallenge","FromTrustedByteArray","GroupElement","HashToGroupElement","MultiScalarMul","Pairing","Scalar"]};

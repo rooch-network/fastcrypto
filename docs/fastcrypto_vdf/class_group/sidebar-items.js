@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["discriminant","hash","reduction"],"struct":["QuadraticForm"]};

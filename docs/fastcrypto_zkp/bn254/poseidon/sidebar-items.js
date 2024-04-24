@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FIELD_ELEMENT_SIZE_IN_BYTES","MERKLE_TREE_DEGREE"],"fn":["poseidon","poseidon_bytes","poseidon_merkle_tree"]};
