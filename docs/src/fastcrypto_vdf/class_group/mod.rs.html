@@ -1,6 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fastcrypto-vdf/src/class_group/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fastcrypto_vdf" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../fastcrypto_vdf/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fastcrypto-vdf/src/class_group/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fastcrypto_vdf" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">fastcrypto_vdf/class_group/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -346,87 +345,7 @@
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
-<a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright (c) 2022, Mysten Labs, Inc.
+<a href="#347" id="347">347</a></pre></div><pre class="rust"><code><span class="comment">// Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 </span><span class="doccomment">//! This module contains implementation of imaginary class groups. Elements are represented by
@@ -434,17 +353,19 @@
 //! for the composition.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::extended_gcd::{extended_euclidean_algorithm, EuclideanAlgorithmOutput};
-<span class="kw">use crate</span>::{ParameterizedGroupElement, ToBytes, UnknownOrderGroupElement};
+<span class="kw">use </span><span class="kw">crate</span>::math::parameterized_group::ParameterizedGroupElement;
+<span class="kw">use </span>core::cell::OnceCell;
 <span class="kw">use </span>discriminant::Discriminant;
 <span class="kw">use </span>fastcrypto::error::FastCryptoError::InvalidInput;
 <span class="kw">use </span>fastcrypto::error::FastCryptoResult;
 <span class="kw">use </span>fastcrypto::groups::Doubling;
-<span class="kw">use </span>num_bigint::{BigInt, Sign};
+<span class="kw">use </span>num_bigint::BigInt;
 <span class="kw">use </span>num_integer::Integer;
 <span class="kw">use </span>num_traits::{One, Signed, Zero};
-<span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>std::mem::swap;
-<span class="kw">use </span>std::ops::{Add, Mul, Neg};
+<span class="kw">use </span>std::ops::{Add, Neg};
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests;
@@ -452,32 +373,39 @@
 <span class="doccomment">/// This module implements a hash function for imaginary class groups whichtakes an arbitrary binary input and returns
 /// an element in the class group. The output of the hash function is uniformly random on a large subset of the class
 /// group but not the entire class group.
-</span><span class="kw">pub mod </span>hash;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>hash;
 
 <span class="doccomment">/// Two quadratic forms may represent the same element in the class group, but each equivalence class contains exactly
 /// one reduced form. This module contains methods to reduce quadratic forms, which besides uniqness also ensures that
 /// the coefficients does not become too large.
-</span><span class="kw">pub mod </span>reduction;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>reduction;
 
 <span class="doccomment">/// Discriminants of quadratic forms are negative primes which is 1 mod 8. This module contains a type to represent
 /// discriminants and methods to create them.
 </span><span class="kw">pub mod </span>discriminant;
 
+<span class="doccomment">/// Serialization and deserialization for `num_bigint::BigInt`. The format used in num_bigint is
+/// a serialization of the u32 words which is hard to port to other platforms. Instead we serialize
+/// a big integer as the two's-complement byte representation in big-endian byte order. See also
+/// [BigInt::to_signed_bytes_be].
+</span><span class="kw">mod </span>bigint_serde;
+
 <span class="doccomment">/// A binary quadratic form, (a, b, c) for arbitrary integers a, b, and c.
-///
-/// The `partial_gcd_limit` variable must be equal to `|discriminant|^{1/4}` and is used to speed up
-/// the composition algorithm.
-</span><span class="attr">#[derive(PartialEq, Eq, Debug, Clone)]
+</span><span class="attr">#[derive(Eq, Debug, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>QuadraticForm {
-    <span class="kw">pub </span>a: BigInt,
-    <span class="kw">pub </span>b: BigInt,
-    <span class="kw">pub </span>c: BigInt,
-    partial_gcd_limit: BigInt,
+    <span class="attr">#[serde(with = <span class="string">"bigint_serde"</span>)]
+    </span><span class="kw">pub </span>a: BigInt,
+    <span class="attr">#[serde(with = <span class="string">"bigint_serde"</span>)]
+    </span><span class="kw">pub </span>b: BigInt,
+    <span class="attr">#[serde(with = <span class="string">"bigint_serde"</span>)]
+    </span><span class="kw">pub </span>c: BigInt,
+    <span class="attr">#[serde(skip)]
+    </span>partial_gcd_limit: OnceCell&lt;BigInt&gt;,
 }
 
 <span class="kw">impl </span>QuadraticForm {
     <span class="doccomment">/// Create a new quadratic form given only the a and b coefficients and the discriminant.
-    </span><span class="kw">pub fn </span>from_a_b_discriminant(
+    </span><span class="kw">pub fn </span>from_a_b_and_discriminant(
         a: BigInt,
         b: BigInt,
         discriminant: <span class="kw-2">&amp;</span>Discriminant,
@@ -497,71 +425,29 @@
             a,
             b,
             c,
-            <span class="comment">// This limit is used by `partial_euclidean_algorithm` in the add method.
-            </span>partial_gcd_limit: discriminant.as_bigint().abs().nth_root(<span class="number">4</span>),
+            partial_gcd_limit: OnceCell::new(),
         })
     }
 
-    <span class="doccomment">/// Create a new quadratic form from a serialization. The format is a byte array with the following structure:
-    ///
-    /// `a_len` (2 bytes, big endian) | `a` as unsigned big endian bytes | `b_len` (2 bytes, big endian) | `b` as signed
-    /// big endian bytes
-    ///
-    /// The c coefficient is computed from a and b and the discriminant. If the format is not followed or if the
-    /// coefficients do not form a valid quadratic form, an error is returned.
-    ///
-    /// See also [`QuadraticForm::to_bytes`].
-    </span><span class="kw">pub fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span>[u8], discriminant: <span class="kw-2">&amp;</span>Discriminant) -&gt; FastCryptoResult&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">0</span>;
+    <span class="doccomment">/// The GCD computation in composition may finish early when coefficients are below this limit
+    /// which is set lazily to `L = |discriminant|^{1/4}`. Algorithm 1 from Jacobson, Jr, Michael &amp;
+    /// Poorten, Alfred (2002). "Computational aspects of NUCOMP", Lecture Notes in Computer Science.
+    /// (https://www.researchgate.net/publication/221451638_Computational_aspects_of_NUCOMP)
+    </span><span class="kw">fn </span>partial_gcd_limit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BigInt {
+        <span class="self">self</span>.partial_gcd_limit
+            .get_or_init(|| <span class="self">self</span>.discriminant().abs().nth_root(<span class="number">4</span>))
+    }
 
-        <span class="kw">if </span>bytes.len() &lt; <span class="number">2 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidInput);
-        }
-
-        <span class="kw">let </span>a_len = u16::from_be_bytes(bytes[index..<span class="number">2</span>].try_into().expect(<span class="string">"Never fails"</span>)) <span class="kw">as </span>usize;
-        index += <span class="number">2</span>;
-
-        <span class="kw">if </span>bytes.len() &lt; index + a_len {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidInput);
-        }
-
-        <span class="kw">let </span>a = BigInt::from_bytes_be(Sign::Plus, <span class="kw-2">&amp;</span>bytes[index..index + a_len]);
-        index += a_len;
-
-        <span class="kw">if </span>bytes.len() &lt; index + <span class="number">2 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidInput);
-        }
-
-        <span class="kw">let </span>b_len =
-            u16::from_be_bytes(bytes[index..index + <span class="number">2</span>].try_into().expect(<span class="string">"Never fails"</span>)) <span class="kw">as </span>usize;
-        index += <span class="number">2</span>;
-
-        <span class="kw">if </span>bytes.len() &lt; index + b_len {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidInput);
-        }
-
-        <span class="kw">let </span>b = BigInt::from_signed_bytes_be(<span class="kw-2">&amp;</span>bytes[index..index + b_len]);
-        index += b_len;
-
-        <span class="comment">// Check that all bytes are used
-        </span><span class="kw">if </span>index != bytes.len() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidInput);
-        }
-
-        <span class="self">Self</span>::from_a_b_discriminant(a, b, discriminant)
+    <span class="doccomment">/// Compute the discriminant of this quadratic form, eg. b^2 - 4ac.
+    </span><span class="kw">pub fn </span>discriminant(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BigInt {
+        <span class="self">self</span>.b.pow(<span class="number">2</span>) - ((<span class="kw-2">&amp;</span><span class="self">self</span>.a * <span class="kw-2">&amp;</span><span class="self">self</span>.c) &lt;&lt; <span class="number">2</span>)
     }
 
     <span class="doccomment">/// Return a generator (or, more precisely, an element with a presumed large order) in a class group with a given
     /// discriminant which is 1 mod 8. We use the element `(2, 1, c)` where `c` is determined from the discriminant.
     </span><span class="kw">pub fn </span>generator(discriminant: <span class="kw-2">&amp;</span>Discriminant) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::from_a_b_discriminant(BigInt::from(<span class="number">2</span>), BigInt::one(), discriminant)
+        <span class="self">Self</span>::from_a_b_and_discriminant(BigInt::from(<span class="number">2</span>), BigInt::one(), discriminant)
             .expect(<span class="string">"Always succeeds when the discriminant is 1 mod 8"</span>)
-    }
-
-    <span class="doccomment">/// Compute the discriminant `b^2 - 4ac` for this quadratic form.
-    </span><span class="kw">pub fn </span>discriminant(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Discriminant {
-        Discriminant::try_from(<span class="self">self</span>.b.pow(<span class="number">2</span>) - ((<span class="kw-2">&amp;</span><span class="self">self</span>.a * <span class="kw-2">&amp;</span><span class="self">self</span>.c) &lt;&lt; <span class="number">2</span>))
-            .expect(<span class="string">"The discriminant is checked in the constructors"</span>)
     }
 
     <span class="doccomment">/// Compute the composition of this quadratic form with another quadratic form.
@@ -592,7 +478,8 @@
             y: c,
             a_divided_by_gcd: <span class="kw-2">mut </span>capital_cy,
             b_divided_by_gcd: <span class="kw-2">mut </span>capital_by,
-        } = extended_euclidean_algorithm(u2, u1);
+        } = extended_euclidean_algorithm(u2, u1, <span class="bool-val">true</span>);
+        <span class="kw">let </span>b = b.expect(<span class="string">"Was computed because compute_x is true above"</span>);
 
         <span class="kw">let </span>(q, r) = s.div_rem(<span class="kw-2">&amp;</span>f);
         <span class="kw">let </span>(g, capital_bx, capital_dy) = <span class="kw">if </span>r.is_zero() {
@@ -605,53 +492,35 @@
                 y,
                 a_divided_by_gcd: h,
                 b_divided_by_gcd,
-            } = extended_euclidean_algorithm(<span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>s);
-            capital_by <span class="kw-2">*</span>= <span class="kw-2">&amp;</span>h;
-            capital_cy <span class="kw-2">*</span>= <span class="kw-2">&amp;</span>h;
+            } = extended_euclidean_algorithm(<span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>s, <span class="bool-val">false</span>);
 
             <span class="comment">// 4.
             </span><span class="kw">let </span>l = (<span class="kw-2">&amp;</span>y * (<span class="kw-2">&amp;</span>b * (w1.mod_floor(<span class="kw-2">&amp;</span>h)) + <span class="kw-2">&amp;</span>c * (w2.mod_floor(<span class="kw-2">&amp;</span>h)))).mod_floor(<span class="kw-2">&amp;</span>h);
-            (
-                g,
-                <span class="kw-2">&amp;</span>b * (<span class="kw-2">&amp;</span>m / <span class="kw-2">&amp;</span>h) + <span class="kw-2">&amp;</span>l * (<span class="kw-2">&amp;</span>capital_by / <span class="kw-2">&amp;</span>h),
-                b_divided_by_gcd,
-            )
+            <span class="kw">let </span>capital_bx = <span class="kw-2">&amp;</span>b * (<span class="kw-2">&amp;</span>m / <span class="kw-2">&amp;</span>h) + <span class="kw-2">&amp;</span>l * <span class="kw-2">&amp;</span>capital_by;
+            capital_by <span class="kw-2">*</span>= <span class="kw-2">&amp;</span>h;
+            capital_cy <span class="kw-2">*</span>= <span class="kw-2">&amp;</span>h;
+            (g, capital_bx, b_divided_by_gcd)
         };
 
         <span class="comment">// 5. (partial xgcd)
-        </span><span class="kw">let </span><span class="kw-2">mut </span>bx = capital_bx.mod_floor(<span class="kw-2">&amp;</span>capital_by);
-        <span class="kw">let </span><span class="kw-2">mut </span>by = capital_by.clone();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>x = BigInt::one();
-        <span class="kw">let </span><span class="kw-2">mut </span>y = BigInt::zero();
-        <span class="kw">let </span><span class="kw-2">mut </span>z = <span class="number">0u32</span>;
-
-        <span class="kw">while </span>by.abs() &gt; <span class="self">self</span>.partial_gcd_limit &amp;&amp; !bx.is_zero() {
-            <span class="kw">let </span>(q, t) = by.div_rem(<span class="kw-2">&amp;</span>bx);
-            by = bx;
-            bx = t;
-            swap(<span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>y);
-            x -= <span class="kw-2">&amp;</span>q * <span class="kw-2">&amp;</span>y;
-            z += <span class="number">1</span>;
-        }
-
-        <span class="kw">if </span>z.is_odd() {
-            by = -by;
-            y = -y;
-        }
+        </span><span class="kw">let </span>(bx, x, by, y, iterated) = partial_xgcd(
+            capital_bx.mod_floor(<span class="kw-2">&amp;</span>capital_by),
+            capital_by.clone(),
+            <span class="self">self</span>.partial_gcd_limit(),
+        );
 
         <span class="kw">let </span>u3: BigInt;
         <span class="kw">let </span>w3: BigInt;
         <span class="kw">let </span>v3: BigInt;
 
-        <span class="kw">if </span>z == <span class="number">0 </span>{
+        <span class="kw">if </span>!iterated {
             <span class="comment">// 6.
             </span><span class="kw">let </span>q = <span class="kw-2">&amp;</span>capital_cy * <span class="kw-2">&amp;</span>bx;
             <span class="kw">let </span>cx = (<span class="kw-2">&amp;</span>q - <span class="kw-2">&amp;</span>m) / <span class="kw-2">&amp;</span>capital_by;
             <span class="kw">let </span>dx = (<span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>capital_dy - w2) / <span class="kw-2">&amp;</span>capital_by;
             u3 = <span class="kw-2">&amp;</span>by * <span class="kw-2">&amp;</span>capital_cy;
-            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>cx - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>dx;
             v3 = v2 - (<span class="kw-2">&amp;</span>q &lt;&lt; <span class="number">1</span>);
+            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>cx - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>dx;
         } <span class="kw">else </span>{
             <span class="comment">// 7.
             </span><span class="kw">let </span>cx = (<span class="kw-2">&amp;</span>capital_cy * <span class="kw-2">&amp;</span>bx - <span class="kw-2">&amp;</span>m * <span class="kw-2">&amp;</span>x) / <span class="kw-2">&amp;</span>capital_by;
@@ -668,133 +537,114 @@
             };
 
             u3 = <span class="kw-2">&amp;</span>by * <span class="kw-2">&amp;</span>cy - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>y * <span class="kw-2">&amp;</span>dy;
-            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>cx - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>x * <span class="kw-2">&amp;</span>dx;
             v3 = <span class="kw-2">&amp;</span>g * (<span class="kw-2">&amp;</span>q3 + <span class="kw-2">&amp;</span>q4) - <span class="kw-2">&amp;</span>q1 - <span class="kw-2">&amp;</span>q2;
+            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>cx - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>x * <span class="kw-2">&amp;</span>dx;
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>form = QuadraticForm {
+        QuadraticForm {
             a: u3,
             b: v3,
             c: w3,
             partial_gcd_limit: <span class="self">self</span>.partial_gcd_limit.clone(),
-        };
-        form.reduce();
-        form
+        }
+        .reduce()
     }
 }
 
 <span class="kw">impl </span>Doubling <span class="kw">for </span>QuadraticForm {
-    <span class="kw">fn </span>double(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>double(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// Slightly optimised version of Algorithm 2 from Jacobson, Jr, Michael &amp; Poorten, Alfred
         // (2002). "Computational aspects of NUCOMP", Lecture Notes in Computer Science.
         // (https://www.researchgate.net/publication/221451638_Computational_aspects_of_NUCOMP)
         // The paragraph numbers and variable names follow the paper.
 
-        </span><span class="kw">let </span>u = <span class="kw-2">&amp;</span><span class="self">self</span>.a;
-        <span class="kw">let </span>v = <span class="kw-2">&amp;</span><span class="self">self</span>.b;
-        <span class="kw">let </span>w = <span class="kw-2">&amp;</span><span class="self">self</span>.c;
-
-        <span class="kw">let </span>EuclideanAlgorithmOutput {
+        </span><span class="kw">let </span>EuclideanAlgorithmOutput {
             gcd: g,
             x: <span class="kw">_</span>,
             y,
             a_divided_by_gcd: capital_by,
             b_divided_by_gcd: capital_dy,
-        } = extended_euclidean_algorithm(u, v);
+        } = extended_euclidean_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>.a, <span class="kw-2">&amp;</span><span class="self">self</span>.b, <span class="bool-val">false</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>bx = (<span class="kw-2">&amp;</span>y * w).mod_floor(<span class="kw-2">&amp;</span>capital_by);
-        <span class="kw">let </span><span class="kw-2">mut </span>by = capital_by.clone();
+        <span class="kw">let </span>(bx, x, by, y, iterated) = partial_xgcd(
+            (<span class="kw-2">&amp;</span>y * <span class="kw-2">&amp;</span><span class="self">self</span>.c).mod_floor(<span class="kw-2">&amp;</span>capital_by),
+            capital_by.clone(),
+            <span class="self">self</span>.partial_gcd_limit(),
+        );
 
-        <span class="kw">let </span><span class="kw-2">mut </span>x = BigInt::one();
-        <span class="kw">let </span><span class="kw-2">mut </span>y = BigInt::zero();
-        <span class="kw">let </span><span class="kw-2">mut </span>z = <span class="number">0u32</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>u3 = <span class="kw-2">&amp;</span>by * <span class="kw-2">&amp;</span>by;
+        <span class="kw">let </span><span class="kw-2">mut </span>w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>bx;
+        <span class="kw">let </span><span class="kw-2">mut </span>v3 = -(by * <span class="kw-2">&amp;</span>bx) &lt;&lt; <span class="number">1</span>;
 
-        <span class="kw">while </span>by.abs() &gt; <span class="self">self</span>.partial_gcd_limit &amp;&amp; !bx.is_zero() {
-            <span class="kw">let </span>(q, t) = by.div_rem(<span class="kw-2">&amp;</span>bx);
-            by = bx;
-            bx = t;
-            swap(<span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>y);
-            x -= <span class="kw-2">&amp;</span>q * <span class="kw-2">&amp;</span>y;
-            z += <span class="number">1</span>;
-        }
-
-        <span class="kw">if </span>z.is_odd() {
-            by = -by;
-            y = -y;
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>u3: BigInt;
-        <span class="kw">let </span><span class="kw-2">mut </span>w3: BigInt;
-        <span class="kw">let </span><span class="kw-2">mut </span>v3: BigInt;
-
-        <span class="kw">if </span>z == <span class="number">0 </span>{
-            <span class="kw">let </span>dx = (<span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>capital_dy - w) / <span class="kw-2">&amp;</span>capital_by;
-            u3 = <span class="kw-2">&amp;</span>by * <span class="kw-2">&amp;</span>by;
-            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>bx;
-            <span class="kw">let </span>s = <span class="kw-2">&amp;</span>bx + <span class="kw-2">&amp;</span>by;
-            v3 = v - <span class="kw-2">&amp;</span>s * <span class="kw-2">&amp;</span>s + <span class="kw-2">&amp;</span>u3 + <span class="kw-2">&amp;</span>w3;
-            w3 = <span class="kw-2">&amp;</span>w3 - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>dx;
+        <span class="kw">if </span>!iterated {
+            <span class="kw">let </span>dx = (<span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>capital_dy - <span class="kw-2">&amp;</span><span class="self">self</span>.c) / <span class="kw-2">&amp;</span>capital_by;
+            v3 += <span class="kw-2">&amp;</span><span class="self">self</span>.b;
+            w3 -= <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>dx;
         } <span class="kw">else </span>{
-            <span class="kw">let </span>dx = (<span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>capital_dy - w * <span class="kw-2">&amp;</span>x) / <span class="kw-2">&amp;</span>capital_by;
+            <span class="kw">let </span>dx = (<span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>capital_dy - <span class="kw-2">&amp;</span><span class="self">self</span>.c * <span class="kw-2">&amp;</span>x) / <span class="kw-2">&amp;</span>capital_by;
             <span class="kw">let </span>q1 = <span class="kw-2">&amp;</span>dx * <span class="kw-2">&amp;</span>y;
             <span class="kw">let </span><span class="kw-2">mut </span>dy = <span class="kw-2">&amp;</span>q1 + <span class="kw-2">&amp;</span>capital_dy;
-            v3 = <span class="kw-2">&amp;</span>g * (<span class="kw-2">&amp;</span>dy + <span class="kw-2">&amp;</span>q1);
-            dy = <span class="kw-2">&amp;</span>dy / <span class="kw-2">&amp;</span>x;
-            u3 = <span class="kw-2">&amp;</span>by * <span class="kw-2">&amp;</span>by;
-            w3 = <span class="kw-2">&amp;</span>bx * <span class="kw-2">&amp;</span>bx;
-            v3 = <span class="kw-2">&amp;</span>v3 - (<span class="kw-2">&amp;</span>bx + <span class="kw-2">&amp;</span>by).pow(<span class="number">2</span>) + <span class="kw-2">&amp;</span>u3 + <span class="kw-2">&amp;</span>w3;
+            v3 += <span class="kw-2">&amp;</span>g * (<span class="kw-2">&amp;</span>dy + <span class="kw-2">&amp;</span>q1);
+            dy /= <span class="kw-2">&amp;</span>x;
 
-            u3 = <span class="kw-2">&amp;</span>u3 - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>y * <span class="kw-2">&amp;</span>dy;
-            w3 = <span class="kw-2">&amp;</span>w3 - <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>x * <span class="kw-2">&amp;</span>dx;
+            u3 -= <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>y * <span class="kw-2">&amp;</span>dy;
+            w3 -= <span class="kw-2">&amp;</span>g * <span class="kw-2">&amp;</span>x * <span class="kw-2">&amp;</span>dx;
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>form = QuadraticForm {
+        QuadraticForm {
             a: u3,
             b: v3,
             c: w3,
             partial_gcd_limit: <span class="self">self</span>.partial_gcd_limit.clone(),
-        };
-        form.reduce();
-        form
+        }
+        .reduce()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>BigInt&gt; <span class="kw">for </span>QuadraticForm {
-    <span class="kw">type </span>Output = <span class="self">Self</span>;
+<span class="doccomment">/// Compute the xgcd of bx and by with a partial limit. When by is below the limit, the computation
+/// stops early and returns the result. The result is a tuple (bx, x, by, y, iterated) where bx and
+/// by are the now reduced coefficients, x and y are the Bezout coefficients for bx and by respectively,
+/// and iterated is true if the there were any iterations.
+</span><span class="kw">fn </span>partial_xgcd(
+    <span class="kw-2">mut </span>bx: BigInt,
+    <span class="kw-2">mut </span>by: BigInt,
+    limit: <span class="kw-2">&amp;</span>BigInt,
+) -&gt; (BigInt, BigInt, BigInt, BigInt, bool) {
+    <span class="kw">let </span><span class="kw-2">mut </span>x = BigInt::one();
+    <span class="kw">let </span><span class="kw-2">mut </span>y = BigInt::zero();
+    <span class="kw">let </span><span class="kw-2">mut </span>iterated = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>odd = <span class="bool-val">false</span>;
 
-    <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>BigInt) -&gt; <span class="self">Self</span>::Output {
-        <span class="self">self</span>.borrow().mul(rhs)
+    <span class="kw">while </span>by.abs() &gt; <span class="kw-2">*</span>limit &amp;&amp; !bx.is_zero() {
+        <span class="kw">let </span>(q, r) = by.div_rem(<span class="kw-2">&amp;</span>bx);
+        by = bx;
+        bx = r;
+        swap(<span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>y);
+        x -= <span class="kw-2">&amp;</span>q * <span class="kw-2">&amp;</span>y;
+
+        odd = !odd;
+        iterated = <span class="bool-val">true</span>;
     }
+
+    <span class="kw">if </span>odd {
+        by = -by;
+        y = -y;
+    }
+
+    (bx, x, by, y, iterated)
 }
 
 <span class="kw">impl </span>ParameterizedGroupElement <span class="kw">for </span>QuadraticForm {
     <span class="doccomment">/// The discriminant of a quadratic form defines the class group.
     </span><span class="kw">type </span>ParameterType = Discriminant;
 
-    <span class="kw">type </span>ScalarType = BigInt;
-
     <span class="kw">fn </span>zero(discriminant: <span class="kw-2">&amp;</span><span class="self">Self</span>::ParameterType) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::from_a_b_discriminant(BigInt::one(), BigInt::one(), discriminant)
+        <span class="self">Self</span>::from_a_b_and_discriminant(BigInt::one(), BigInt::one(), discriminant)
             .expect(<span class="string">"Doesn't fail"</span>)
     }
 
-    <span class="kw">fn </span>mul(<span class="kw-2">&amp;</span><span class="self">self</span>, scale: <span class="kw-2">&amp;</span>BigInt) -&gt; <span class="self">Self </span>{
-        <span class="kw">if </span>scale.is_zero() {
-            <span class="kw">return </span><span class="self">Self</span>::zero(<span class="kw-2">&amp;</span><span class="self">self</span>.discriminant());
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.clone();
-        <span class="kw">for </span>i <span class="kw">in </span>(<span class="number">0</span>..scale.bits() - <span class="number">1</span>).rev() {
-            result = result.double();
-            <span class="kw">if </span>scale.bit(i) {
-                result = result + <span class="self">self</span>;
-            }
-        }
-        result
-    }
-
-    <span class="kw">fn </span>same_group(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.discriminant() == other.discriminant()
+    <span class="kw">fn </span>is_in_group(<span class="kw-2">&amp;</span><span class="self">self</span>, discriminant: <span class="kw-2">&amp;</span>Discriminant) -&gt; bool {
+        discriminant.as_bigint().eq(<span class="kw-2">&amp;</span><span class="self">self</span>.discriminant())
     }
 }
 
@@ -835,21 +685,11 @@
     }
 }
 
-<span class="kw">impl </span>ToBytes <span class="kw">for </span>QuadraticForm {
-    <span class="kw">fn </span>to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-        <span class="comment">// a is always positive
-        </span><span class="kw">let </span>a_bytes = <span class="self">self</span>.a.to_bytes_be().<span class="number">1</span>;
-        <span class="kw">let </span>b_bytes = <span class="self">self</span>.b.to_signed_bytes_be();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::with_capacity(a_bytes.len() + b_bytes.len() + <span class="number">8</span>);
-        result.extend_from_slice(<span class="kw-2">&amp;</span>(a_bytes.len() <span class="kw">as </span>u16).to_be_bytes());
-        result.extend_from_slice(<span class="kw-2">&amp;</span>a_bytes);
-        result.extend_from_slice(<span class="kw-2">&amp;</span>(b_bytes.len() <span class="kw">as </span>u16).to_be_bytes());
-        result.extend_from_slice(<span class="kw-2">&amp;</span>b_bytes);
-
-        result
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>QuadraticForm {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="comment">// Ignore the partial_gcd_limit field. This field is computed lazily and is not part of the
+        // actual value of the QuadraticForm.
+        </span><span class="self">self</span>.a == other.a &amp;&amp; <span class="self">self</span>.b == other.b &amp;&amp; <span class="self">self</span>.c == other.c
     }
 }
-
-<span class="kw">impl </span>UnknownOrderGroupElement <span class="kw">for </span>QuadraticForm {}
 </code></pre></div></section></main></body></html>

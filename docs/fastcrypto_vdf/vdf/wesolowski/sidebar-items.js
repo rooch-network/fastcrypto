@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["CHALLENGE_SIZE"],"mod":["fiat_shamir"],"struct":["FastVerifier","WesolowskisVDF"],"type":["StrongVDF","StrongVDFVerifier"]};
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_CHALLENGE_SIZE_IN_BYTES"],"struct":["WesolowskisVDF"],"type":["DefaultVDF"]};
